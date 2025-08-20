@@ -1,0 +1,239 @@
+/* --- keep your existing resets --- */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    background-color: #fce4ec;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden; /* Prevents scrolling */
+}
+
+/* Card */
+.card {
+    width: 350px;
+    height: 500px;
+    position: relative;
+    perspective: 1500px;
+}
+
+/* the outside (cover) and inside panels */
+.outside, .inside {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* make 3D children behave */
+.outside {
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: pointer;
+    z-index: 2; /* above inside normally */
+}
+
+/* front: the visible cover */
+.front {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    background-color: #ffffff;
+    position: relative;
+}
+
+/* NOTE: I removed/disabled the separate .back panel to keep things simple.
+   If you want the cover to have an inner back color when flipped, we
+   can reintroduce .back. For now we keep the design as: one cover (.front)
+   + one inside (.inside). */
+
+/* inside panel (right side when open) */
+.inside {
+    background: linear-gradient(to right, #fff1eb, #ace0f9);
+    padding: 30px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1;
+    transform: translateZ(-1px);
+}
+
+.front .title {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 1.6em;
+    font-weight: bold;
+    color: #4a4a4a;
+}
+
+.front .click-me {
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 1.2em;
+    color: #555;
+    animation: blink 1.5s infinite;
+}
+.cake {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 200px;
+}
+
+.inside p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #333;
+}
+
+.top-layer, .middle-layer, .bottom-layer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 60px;
+    background: #ace0f9;
+    border-radius: 10px;
+}
+
+.middle-layer {
+    top: 65px;
+    width: 230px;
+    height: 70px;
+    background: #ace0f9b0;
+}
+
+.bottom-layer {
+    top: 140px;
+    width: 260px;
+    height: 80px;
+    background: #ace0f952;
+}
+
+/* --- NEW CANDLE AND FLAME STYLES --- */
+.candle {
+    width: 15px;
+    height: 50px;
+    background: repeating-linear-gradient(45deg, #ace0f9 0 5px, #ffffff 5px 10px);
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 3px;
+}
+
+.candle::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 8px;
+    background-color: #333;
+    border-radius: 1px;
+}
+
+/* The ::after pseudo-element is the FLAME.
+   We update the rotation angle here. */
+.candle::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    /* This transform now has the CORRECT rotation angle */
+    transform: translateX(-50%) rotate(135deg);
+    border-radius: 50% 50% 50% 0;
+    background: radial-gradient(circle at 40% 30%, #fff9a6 0, #ffd94d 35%, #ffb400 100%);
+    animation: flicker 1.5s ease-in-out infinite;
+}
+
+
+/* --- And update the animation with the CORRECT rotation angle in every step --- */
+@keyframes flicker {
+    0% {
+        transform: translateX(-50%) rotate(135deg) scaleY(1) skewX(0deg);
+        box-shadow: 0 0 10px rgba(255, 180, 0, 0.7);
+        opacity: 1;
+    }
+    25% {
+        transform: translateX(-50%) rotate(135deg) scaleY(1.05) skewX(2deg) translateY(-2px);
+        box-shadow: 0 0 12px rgba(255, 180, 0, 0.8);
+        opacity: 0.95;
+    }
+    50% {
+        transform: translateX(-50%) rotate(135deg) scaleY(0.95) skewX(-2deg);
+        box-shadow: 0 0 8px rgba(255, 180, 0, 0.6);
+        opacity: 1;
+    }
+    75% {
+        transform: translateX(-50%) rotate(135deg) scaleY(1.02) skewX(3deg) translateY(-1px);
+        box-shadow: 0 0 14px rgba(255, 180, 0, 0.9);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateX(-50%) rotate(135deg) scaleY(1) skewX(0deg);
+        box-shadow: 0 0 10px rgba(255, 180, 0, 0.7);
+        opacity: 1;
+    }
+}
+
+/* ---------- Confetti keyframes (we animate transform with both translateY and rotate) ---------- */
+@keyframes fall {
+    to {
+        transform: translateY(120vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ---------- Cover-open rules ---------- */
+/* Add a class-based open rule (so clicks work, not only :hover) */
+.card.is-open > .outside {
+    transform: rotateY(-160deg); /* rotate more so back isn't partially visible */
+}
+
+/* ---------- Confetti container (always on top) ---------- */
+.confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 9999;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent; /* Makes it invisible */
+    z-index: 1; /* Sits behind the card's cover, but above the background */
+    display: none; /* The overlay is hidden by default */
+}
+
+/* This rule shows the overlay when the body has the .card-open class */
+body.card-open .overlay {
+    display: block;
+}
